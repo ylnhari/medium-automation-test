@@ -56,31 +56,32 @@
 
 <blockquote>The agent never touches the Medium editor. Everything is version-controlled as static files in the repo.</blockquote>
 
-<h2>Adding the Skill to OpenClaw</h2>
+<h2>Registering the Skill in OpenClaw</h2>
 
-<p>OpenClaw users can turn this workflow into a reusable skill. The skill file maps a trigger phrase like "write a blog post about X" to the full procedure. Here's how to set it up:</p>
+<p>The repo already includes a ready-to-use skill file at <a href="https://github.com/ylnhari/blog/blob/main/skills/create-post/SKILL.md"><code>skills/create-post/SKILL.md</code></a>. To register it with an AI agentic system like OpenClaw:</p>
 
-<pre><code># 1. Create or copy the skill file into your OpenClaw workspace
-#    The skill references AGENT.md and STANDARDS.md from the blog repo.
-#    Update the local paths in the skill to point at your cloned repo.
+<ol>
+  <li>Fork or clone the repo to your machine.</li>
+  <li>Copy <code>skills/create-post/SKILL.md</code> into your OpenClaw workspace's skills folder.</li>
+  <li>Open the skill file and customize it for your setup:</li>
+</ol>
 
-# 2. The skill's procedure mirrors AGENT.md:
-#    - Read repo files → generate HTML post → create metadata
-#    - Update index.json → commit → wait for deploy → import into Medium
-#    - Report back with draft URL
-
-# 3. Fork the repo and customize AGENT.md to your voice.
-#    Since the agent reads instructions from the repo itself,
-#    changing AGENT.md changes how future posts are written.
+<pre><code># Customizations you'll want to make:
+#
+# 1. Change `C:\Users\...\blog` to your cloned repo path
+# 2. Update trigger phrases to match your preferences
+# 3. Add pre-steps: topic confirmation via email, calendar check, etc.
+# 4. Add post-steps: notify you on Slack/Telegram when draft is ready
+# 5. Tweak the output format to match your reporting style
 </code></pre>
 
-<p>The skill works as a pre- and post-processing wrapper around the core workflow defined in <code>AGENT.md</code>. The pre-step handles topic confirmation and inbox scanning (optional, via Gmail CLI). The post-step reports the Medium draft URL. Everything in between is driven by the repo's own documentation.</p>
+<p>The skill references <code>AGENT.md</code> and <code>STANDARDS.md</code> from the repo, which means the actual publishing workflow is always in sync with the repo. Update those files, and the agent follows the new instructions automatically — no need to edit the skill file again for content or formatting changes.</p>
 
 <h2>Customizing the Workflow</h2>
 
-<p>The most powerful aspect of this setup is that the agent reads its publishing instructions from the repo itself. Want different HTML rules? Edit <code>STANDARDS.md</code>. Want a different commit format or deployment flow? Edit <code>AGENT.md</code>.</p>
+<p>The agent reads its publishing instructions from the repo itself. Want different HTML rules? Edit <code>STANDARDS.md</code>. Want a different commit format or deployment flow? Edit <code>AGENT.md</code>. The skill file only needs to point at your repo — everything else flows from the documentation files inside it.</p>
 
-<p>The skill file in OpenClaw acts as the entry point — it triggers on a phrase and delegates the actual work to the repo's documented workflow. Fork the repo, adjust the agent instructions to match your writing style, and OpenClaw handles the rest.</p>
+<p>Fork the repo, adjust <code>AGENT.md</code> to match your writing style, customize <code>skills/create-post/SKILL.md</code> for your local paths and notification preferences, and your AI handles the rest.</p>
 
 <h2>Why This Works</h2>
 
