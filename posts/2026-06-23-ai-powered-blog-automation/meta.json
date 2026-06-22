@@ -1,9 +1,9 @@
 {
-  "title": "AI-Powered Blog Automation with GitHub Pages and OpenClaw",
+  "title": "Automating Blog Posting on Medium Using AI Agents and OpenClaw",
   "date": "2026-06-23",
   "author": "ylnhari",
-  "description": "How this blog post was written — fully automated via OpenClaw skill, a GitHub Pages repo, and Medium import. Clone it and customize it for your own blog.",
-  "tags": ["blogging", "automation", "openclaw", "github-pages", "ai-tools"],
+  "description": "How to automate blog posting on Medium using AI agents and OpenClaw — a complete setup guide with GitHub Pages and personal assistant workflows.",
+  "tags": ["automation", "blogging", "medium", "ai-agents", "openclaw"],
   "status": "draft",
   "medium_url": null,
   "cover_image": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80"
