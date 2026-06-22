@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Hari's technical blog — AI, automation, and engineering.">
+  <title>ylnhari · Blog</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="blog-index">
+<div class="blog-index">
+
+  <header>
+    <h1>ylnhari's Blog</h1>
+    <p>AI, automation, and engineering — written with a little help from machines.</p>
+  </header>
+
+  <main>
+    <ul class="post-list" id="post-list">
+      <li class="empty-state">Loading posts…</li>
+    </ul>
+  </main>
+
+</div>
+
+<script>
+  fetch('posts/index.json')
+    .then(r => r.json())
+    .then(posts => {
+      const list = document.getElementById('post-list');
+
+      if (!posts.length) {
+        list.innerHTML = '<li class="empty-state">No posts yet. Check back soon.</li>';
+        return;
+      }
+
+      list.innerHTML = posts.map(post => {
+        const date = new Date(post.date + 'T00:00:00').toLocaleDateString('en-US', {
+          year: 'numeric', month: 'long', day: 'numeric'
+        });
+        const tags = (post.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
+        const url = `posts/${post.slug}/`;
+        const mediumLink = post.medium_url
+          ? ` &middot; <a href="${post.medium_url}" target="_blank" rel="noopener">Read on Medium</a>`
+          : '';
+
+        return `
+          <li class="post-card">
+            <h2><a href="${url}">${post.title}</a></h2>
+            <p class="meta">${date}${mediumLink}</p>
+            <p class="description">${post.description}</p>
+            ${tags ? `<div class="tags">${tags}</div>` : ''}
+          </li>`;
+      }).join('');
+    })
+    .catch(() => {
+      document.getElementById('post-list').innerHTML =
+        '<li class="empty-state">Could not load posts.</li>';
+    });
+</script>
+</body>
+</html>
