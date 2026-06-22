@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="ylnhari">
+  <meta name="description" content="An interactive tool to find the optimal vLLM-compatible LLM for any GPU setup — L4 to B200, multi-GPU, quantization-aware model selection for 108+ models.">
+  <meta property="og:title" content="vLLM Model Chooser: Find Your Perfect LLM for Any GPU Setup">
+  <meta property="og:description" content="An interactive tool to find the optimal vLLM-compatible LLM for any GPU setup — L4 to B200, multi-GPU, quantization-aware model selection for 108+ models.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&q=80">
+  <title>vLLM Model Chooser: Find Your Perfect LLM for Any GPU Setup</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<article>
+
+<h1>vLLM Model Chooser: Find Your Perfect LLM for Any GPU Setup</h1>
+<p class="byline">By ylnhari &middot; June 22, 2026 &middot; vLLM, LLM, GPU, open-source, AI-tools</p>
+
+<img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&q=80" alt="Server rack in a data center — GPU infrastructure for LLM inference">
+
+<h2>The Problem: Too Many Models, Too Little Clarity</h2>
+
+<p>If you've ever tried to run an LLM on your own GPU hardware, you've hit this wall: a model's parameter count tells you nothing about whether it'll actually fit on your GPU. A 70B model in BF16 needs ~140 GB of VRAM — but in FP8 it needs ~70 GB, and in NVFP4 it squeezes into ~35 GB. That's four wildly different answers for the same model, depending entirely on which quantization format your GPU supports.</p>
+
+<p>The deeper problem? NVFP4 is native on Blackwell (B100/B200), completely absent on Ada Lovelace (L4). MXFP8 works on Blackwell via vLLM SW support but doesn't exist on Hopper. There's no single place to check "which models fit MY hardware" — until now.</p>
+
+<h2>Introducing vLLM Model Chooser</h2>
+
+<p><strong>vLLM Model Chooser</strong> is a single-file interactive web tool that tells you exactly which vLLM-compatible models run on your GPU setup — with zero configuration, no installation, and instant results. It ships as a standalone <code>index.html</code> that you can open in any browser or serve locally.</p>
+
+<ul>
+  <li><strong>6 GPU types:</strong> L4, A100, H100, H200, B100, B200 — with 1/2/4/8x multi-GPU</li>
+  <li><strong>108 models</strong> with detailed specs: params, VRAM, context length, quantization variants, benchmarks</li>
+  <li><strong>VRAM + quantization dual check:</strong> filters by BOTH weight VRAM AND quantization format compatibility</li>
+  <li><strong>GPU info modal:</strong> full specs, Native HW vs vLLM SW support table, quantization compatibility matrix</li>
+  <li><strong>vLLM Recipe &amp; HuggingFace links</strong> per model</li>
+</ul>
+
+<p>The tool is open-source under MIT license: <a href="https://github.com/ylnhari/vllm-model-chooser">github.com/ylnhari/vllm-model-chooser</a></p>
+
+<blockquote>"There's no single place to check which models fit MY hardware — until now."</blockquote>
+
+<h2>Why Quantization Awareness Matters</h2>
+
+<p>The landscape of quantization formats has exploded in the last year. vLLM supports BF16, FP8, INT4/AWQ/GPTQ, NVFP4, MXFP4, and MXFP8 — but not every GPU supports every format:</p>
+
+<ul>
+  <li><strong>BF16:</strong> Native on all GPUs from Ada to Blackwell</li>
+  <li><strong>FP8:</strong> Native on Hopper and Blackwell; software emulation on Ampere via vLLM</li>
+  <li><strong>INT4/AWQ/GPTQ:</strong> Software support on all architectures via vLLM</li>
+  <li><strong>NVFP4:</strong> Native on Blackwell only — completely absent on L4, A100, and H100</li>
+  <li><strong>MXFP4:</strong> Native on Blackwell, software on Hopper</li>
+  <li><strong>MXFP8:</strong> Software on Blackwell only</li>
+</ul>
+
+<p>This means a model that fits on a B200 in NVFP4 might be 4x too large for the same model on an H100. The Chooser handles this automatically — pick your GPU, and it only shows quantization variants that actually work on that hardware.</p>
+
+<h2>How It Works</h2>
+
+<p>The interface is simple but powerful:</p>
+
+<ol>
+  <li><strong>Select your GPU</strong> — L4, A100, H100, H200, B100, or B200</li>
+  <li><strong>Choose GPU count</strong> — 1, 2, 4, or 8 GPUs</li>
+  <li><strong>Optional filters</strong> — Precision format, model type (Text, Vision, MoE, Embedding), minimum context length</li>
+  <li><strong>Sort</strong> — by parameters, VRAM, context length, MMLU score, or HumanEval score</li>
+  <li><strong>Search</strong> — type any model name to find it instantly</li>
+</ul>
+
+<p>The tool instantly recalculates and shows you exactly which models fit, with per-GPU feasibility indicators (green checkmark for fits, red X for doesn't) for each count configuration.</p>
+
+<p>For each model, you see:</p>
+<ul>
+  <li>Parameter count &amp; active parameters (for MoE models like DeepSeek-V4 with 1600B/49B)</li>
+  <li>VRAM requirements in GB</li>
+  <li>Context length</li>
+  <li>Available quantization variants with VRAM at each quantization level</li>
+  <li>MMLU &amp; HumanEval benchmark scores</li>
+  <li>Direct links to vLLM Recipe and HuggingFace</li>
+</ul>
+
+<h2>Multi-GPU Support: From 1 to 8 GPUs</h2>
+
+<p>One of the most valuable features is the multi-GPU slider. The tool combines usable VRAM across GPUs (with a 95% usable factor to account for system overhead) and checks model fit at each count. This makes it easy to answer questions like:</p>
+
+<ul>
+  <li><strong>"Can Llama-3.3-70B run on a single L4?"</strong> — No (needs 140 GB BF16, L4 has 23 GB usable).</li>
+  <li><strong>"What about 4x L4?"</strong> — Yes! 184 GB usable is enough for BF16.</li>
+  <li><strong>"What about 2x H100 in FP8?"</strong> — Yes, 152 GB usable comfortably fits 70 GB FP8.</li>
+</ul>
+
+<p>The tool even handles next-gen hardware: B100 and B200 with 192 GB each (182 GB usable per card) unlock 8-GPU setups with up to 1,456 GB of usable VRAM — enough for models like DeepSeek-V4 (960 GB in NVFP4) or Qwen3-Coder-480B.</p>
+
+<h2>108 Models, All in One Place</h2>
+
+<p>The latest generation of open-weight models is covered comprehensively:</p>
+
+<ul>
+  <li><strong>DeepSeek:</strong> V3/V3.1/V3.2, V4-Pro (1600B/49B), V4-Flash (284B/13B), R1 (671B/37B)</li>
+  <li><strong>Qwen:</strong> Qwen3-32B, Qwen3-235B-A22B, Qwen3-Coder-480B, Qwen3.5 series (0.8B to 397B)</li>
+  <li><strong>Meta:</strong> Llama-3.1-8B, Llama-3.3-70B, Llama-4-Scout-109B/17B</li>
+  <li><strong>Mistral:</strong> Small-4-119B, Large-3-675B, Medium-3.5-128B</li>
+  <li><strong>Google:</strong> Gemma-4 series (5B to 31B), diffusiongemma, translategemma</li>
+  <li><strong>NVIDIA:</strong> Nemotron-3 (Nano to Ultra 550B), Cosmos3 series</li>
+  <li><strong>Kimi/Moonshot:</strong> K2-Instruct, K2-Thinking, K2.5, K2.7-Code (1T/32B)</li>
+  <li><strong>MiniMax:</strong> M2/M2.1/M2.5/M2.7/M3 series (427B/26B with 1M context)</li>
+  <li><strong>And more:</strong> InternLM, Baidu ERNIE, StepFun, Xiaomi MiMo, InclusionAI Ling</li>
+</ul>
+
+<p>Each model entry also includes a <strong>"Tested"</strong> badge for models validated in production, benchmark scores, and direct links to deployment recipes.</p>
+
+<h2>Built for Practical Deployment</h2>
+
+<p>Under the hood, <strong>vLLM Model Chooser</strong> is refreshingly simple: a single <code>index.html</code> that bundles all HTML, CSS, and JavaScript. No build step, no dependencies, no npm install. Just serve it with any HTTP server:</p>
+
+<pre><code>python3 -m http.server 5000
+# Then open http://localhost:5000</code></pre>
+
+<p>The model data is sourced from vLLM's official recipe catalog (<a href="https://recipes.vllm.ai/models.json">recipes.vllm.ai/models.json</a>) and supplemented with detailed quantization compatibility information from <a href="https://docs.vllm.ai/en/stable/features/quantization/">vLLM's quantization docs</a>.</p>
+
+<hr>
+
+<h2>Conclusion</h2>
+
+<p>If you're deploying LLMs with vLLM, the <strong>vLLM Model Chooser</strong> saves you hours of VRAM arithmetic and compatibility research. Pick your GPU, see what fits, and get deploying — all from a single HTML file.</p>
+
+<p>Try it live: <a href="https://ylnhari.github.io/vllm-model-chooser/">ylnhari.github.io/vllm-model-chooser</a></p>
+
+<p>Contribute: <a href="https://github.com/ylnhari/vllm-model-chooser">github.com/ylnhari/vllm-model-chooser</a></p>
+
+<hr>
+<p class="footer-note"><em>Published via automated pipeline &middot; <a href="https://ylnhari.github.io/blog">ylnhari.github.io/blog</a></em></p>
+
+</article>
+</body>
+</html>
